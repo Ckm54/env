@@ -114,3 +114,43 @@ func Int(name string, required bool, defaultValue int, help string) *int {
 
 	return v
 }
+
+// Float64 registers a float64 environment variable with the given name, default value, and metadata.
+//
+// Parameters:
+//   - name: Environment variable name.
+//   - required: Whether the variable is mandatory.
+//   - defaultValue: Default value if not set.
+//   - help: Description for documentation.
+//
+// Example:
+//   timeout := env.Float64("TIMEOUT", false, 30.0, "Request timeout in seconds")
+
+func Float64(name string, required bool, defaultValue float64, help string) *float64 {
+	v := new(float64)
+
+	envs = append(envs, envVar{
+		v,
+		name,
+		"float",
+		required,
+		defaultValue,
+		help,
+		func(i interface{}, s string) error {
+			v, err := strconv.ParseFloat(s, 64)
+			if err != nil {
+				i = nil
+				return err
+			}
+
+			*i.(*float64) = float64(v)
+			return nil
+		},
+		func(i1, i2 interface{}) {
+			*i1.(*float64) = i2.(float64)
+		},
+		new(string),
+	})
+
+	return v
+}
