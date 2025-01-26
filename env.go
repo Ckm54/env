@@ -154,3 +154,45 @@ func Float64(name string, required bool, defaultValue float64, help string) *flo
 
 	return v
 }
+
+// Bool registers a boolean environment variable with the given name, default value, and metadata.
+// It appends the variable configuration to the global envs slice and returns a pointer to the boolean value.
+//
+// Parameters:
+//   - name: Environment variable name.
+//   - required: Whether the variable is mandatory.
+//   - defaultValue: Default value if the variable is not set.
+//   - help: Description of the variable for documentation.
+//
+// Example:
+//
+//	debugMode := env.Bool("DEBUG_MODE", false, false, "Enable debug mode")
+func Bool(name string, required bool, defaultValue bool, help string) *bool {
+	v := new(bool)
+
+	envs = append(envs, envVar{
+		v,
+		name,
+		"boolean",
+		required,
+		defaultValue,
+		help,
+		func(i interface{}, s string) error {
+			v, err := strconv.ParseBool(s)
+			if err != nil {
+				i = nil
+				return err
+			}
+
+			*i.(*bool) = bool(v)
+
+			return nil
+		},
+		func(i1, i2 interface{}) {
+			*i1.(*bool) = i2.(bool)
+		},
+		new(string),
+	})
+
+	return v
+}
