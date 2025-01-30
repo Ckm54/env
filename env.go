@@ -2,7 +2,10 @@ package env
 
 import (
 	"flag"
+	"fmt"
+	"os"
 	"strconv"
+	"strings"
 )
 
 type envVar struct {
@@ -195,4 +198,69 @@ func Bool(name string, required bool, defaultValue bool, help string) *bool {
 	})
 
 	return v
+}
+
+func Parse() error {
+	// parse the maub flags package to enable the --help function
+	flag.Parse()
+	if *help == true {
+		fmt.Println("Config values are set using environment variables. For more info please see the following list.")
+		fmt.Println("")
+		fmt.Println(Help())
+
+		os.Exit(0)
+	}
+
+	errors := make([]string, 0)
+
+	for _, e := range envs {
+		err := processEnvVar(e)
+		if err != nil {
+			errors = append(errors, fmt.Sprintf("expected: %s type: %s got: %s", e.name, e.varType, *e.envValue))
+		}
+	}
+
+	if len(errors) > 0 {
+		errString := strings.Join(errors, "\n")
+		return fmt.Errorf(errString)
+	}
+
+	return nil
+}
+
+func processEnvVar(e envVar) error {
+	*e.envValue = os.Getenv(e.name)
+	if *e.envValue == "" && !e.required {
+		e.setDefault(e.value, e.defaultValue)
+		return nil
+	}
+
+	if *e.envValue == "" && e.required {
+		return fmt.Errorf("%s should be provided", e.name)
+	}
+
+	err := e.setValue(e.value, *e.envValue)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Help is help
+func Help() string {
+	h := make([]string, 1)
+	h[0] = "Environment variables:"
+
+	for _, e := range envs {
+		def := fmt.Sprintf("'%v'", e.defaultValue)
+		if def == "''" {
+			def = "no default"
+		}
+
+		h = append(h, "  "+e.name+" default: "+def)
+		h = append(h, "       ")
+	}
+
+	return strings.Join(h, "\n")
 }
