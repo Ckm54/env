@@ -3,6 +3,7 @@ package env
 import (
 	"flag"
 	"strconv"
+	"time"
 )
 
 type envVar struct {
@@ -190,6 +191,36 @@ func Bool(name string, required bool, defaultValue bool, help string) *bool {
 		},
 		func(i1, i2 interface{}) {
 			*i1.(*bool) = i2.(bool)
+		},
+		new(string),
+	})
+
+	return v
+}
+
+func Duration(name string, required bool, defaultValue time.Duration, help string) *time.Duration {
+	v := new(time.Duration)
+
+	envs = append(envs, envVar{
+		v,
+		name,
+		"duration",
+		required,
+		defaultValue,
+		help,
+		func(i interface{}, s string) error {
+			v, err := time.ParseDuration(s)
+			if err != nil {
+				i = nil
+				return err
+			}
+
+			*i.(*time.Duration) = v
+
+			return nil
+		},
+		func(i1, i2 interface{}) {
+			*i1.(*time.Duration) = i2.(time.Duration)
 		},
 		new(string),
 	})
