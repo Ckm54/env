@@ -95,6 +95,7 @@ func Int(name string, required bool, defaultValue int, help string) *int {
 		defaultValue,
 		help,
 		func(a interface{}, b string) error {
+
 			v, err := strconv.ParseInt(b, 10, 64)
 			if err != nil {
 				a = nil
