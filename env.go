@@ -199,3 +199,5 @@ func Bool(name string, required bool, defaultValue bool, help string) *bool {
 
 	return v
 }
+
+// Implement the other functions here
