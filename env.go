@@ -19,6 +19,7 @@ type envVar struct {
 
 var envs []envVar
 
+// define a help flag
 var help = flag.Bool("help", false, "--help to show help")
 
 func init() {
