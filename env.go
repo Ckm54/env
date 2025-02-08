@@ -21,6 +21,8 @@ type envVar struct {
 }
 
 var envs []envVar
+
+// define a help flag
 var help = flag.Bool("help", false, "--help to show help")
 
 func init() {
@@ -110,6 +112,7 @@ func Int(name string, required bool, defaultValue int, help string) *int {
 		// Function to parse and set the integer value from a string.
 		func(a interface{}, b string) error {
 			v, err := strconv.ParseInt(b, 10, 64) // Convert string to int64.
+
 			if err != nil {
 				a = nil // If parsing fails, set `a` to nil.
 				return err
@@ -230,6 +233,7 @@ func Bool(name string, required bool, defaultValue bool, help string) *bool {
 	// Return the pointer to the boolean variable so it can be accessed elsewhere.
 	return v
 }
+
 
 // Parse processes command-line flags and environment variables.
 func Parse() error {
